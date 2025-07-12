@@ -9,5 +9,19 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nareghvictor/victor-cheap-data-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nareghvictor/victor-cheap-data-backend/issues"
+  },
+  "homepage": "https://github.com/nareghvictor/victor-cheap-data-backend#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.3"
+  }
 }
