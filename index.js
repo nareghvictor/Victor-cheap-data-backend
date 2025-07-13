@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
 const transactionRoutes = require("./routes/transactions");
+const webhookRoutes = require('./routes/webhook');
+app.use('/api/webhook', webhookRoutes);
 
 dotenv.config();
 

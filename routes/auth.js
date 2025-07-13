@@ -6,6 +6,10 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/auth"); // ✅ Make sure middleware is added
 
 // ✅ Check if user exists by email
+router.get("/test", (req, res) => {
+  res.send({ message: "API working" });
+});
+
 router.post("/check-email", async (req, res) => {
   try {
     const { email } = req.body;
