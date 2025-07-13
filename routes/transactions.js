@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
-const Transaction = require('../models/transaction');
-const User = require('../models/user');
+const Transaction = require('../models/Transaction');
+const User = require('../models/User');
 
 // 🔐 GET: All user transactions
 router.get('/', authMiddleware, async (req, res) => {

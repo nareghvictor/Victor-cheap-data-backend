@@ -13,7 +13,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions')); // <-- Add this if it exists
-app.use('/api/admin', require('./routes/admin')); // ✅ NEW admin routes
+app.use('/api/admin', require('./routes/Admin')); // ✅ NEW admin routes
 app.use('/api/admin-auth', require('./routes/adminAuth'));
 
 const PORT = process.env.PORT || 5000;
