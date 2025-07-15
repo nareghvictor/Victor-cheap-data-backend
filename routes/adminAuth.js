@@ -1,9 +1,9 @@
+// routes/adminAuth.js
 const express = require('express');
 const router = express.Router();
 const Admin = require('../models/Admin');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-console.log("✅ adminAuth.js is loaded");
 
 // Admin Login
 router.post('/login', async (req, res) => {
@@ -23,10 +23,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Admin Register
 router.post('/register', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const bcrypt = require('bcryptjs');
     const hashed = await bcrypt.hash(password, 10);
     const admin = new Admin({ email, password: hashed });
     await admin.save();
