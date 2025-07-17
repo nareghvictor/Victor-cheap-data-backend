@@ -16,6 +16,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/admin', require('./routes/admin'));           // optional
 app.use('/api/admin-auth', require('./routes/adminAuth'));  // ✅ Admin Login/Register
+app.use('/api/flutterwave', require('./routes/flutterwave'));
+app.use("/api/wallet", require("./routes/wallet"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
