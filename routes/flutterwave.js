@@ -1,42 +1,83 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const auth = require('../middleware/auth');
 const User = require('../models/User');
+require('dotenv').config();
 
-// Fund wallet via Flutterwave
-router.post('/initiate', auth, async (req, res) => {
+// Fund Wallet Route
+router.post('/fund-wallet', async (req, res) => {
+  const { email, amount, name } = req.body;
+
   try {
-    const { amount } = req.body;
-    const user = await User.findById(req.user.id);
-    const tx_ref = `TX-${Date.now()}-${user._id}`;
-
-    const flutterwaveRes = await axios.post('https://api.flutterwave.com/v3/payments', {
-      tx_ref,
-      amount,
-      currency: "NGN",
-      redirect_url: "https://victor-cheap-data.netlify.app/wallet-success.html",
-      customer: {
-        email: user.email,
-        name: user.name
+    const response = await axios.post(
+      'https://api.flutterwave.com/v3/payments',
+      {
+        tx_ref: `VictorTX-${Date.now()}`,
+        amount,
+        currency: 'NGN',
+        redirect_url: 'https://victorcheapdata.com/payment-success.html',
+        customer: {
+          email,
+          name
+        },
+        customizations: {
+          title: 'Victor Cheap Data',
+          description: 'Wallet Top-up',
+          logo: 'https://victorcheapdata.com/logo.png' // optional logo
+        }
       },
-      customizations: {
-        title: "Victor Cheap Data Wallet",
-        logo: "https://i.ibb.co/39yrxJHk/file-000000001788624397c947d3af55d17b.png"
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`
+        }
       }
-    }, {
-      headers: {
-        Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
+    );
 
-    res.json(flutterwaveRes.data);
-
-  } catch (err) {
-    console.error("Flutterwave init error:", err.response?.data || err.message);
-    res.status(500).json({ error: "Failed to initiate Flutterwave payment" });
+    res.json(response.data);
+  } catch (error) {
+    console.error('Flutterwave Init Error:', error.response?.data || error.message);
+    res.status(500).json({ message: 'Payment initialization failed' });
   }
+});
+
+// Webhook to confirm payment
+router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const hash = req.headers['verif-hash'];
+  const secretHash = process.env.FLW_SECRET_HASH;
+
+  if (!hash || hash !== secretHash) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(req.body);
+  } catch (e) {
+    return res.status(400).send('Invalid JSON');
+  }
+
+  if (
+    payload.event === 'charge.completed' &&
+    payload.data.status === 'successful'
+  ) {
+    const { amount, customer, tx_ref } = payload.data;
+    const email = customer.email;
+
+    try {
+      const user = await User.findOne({ email });
+      if (user) {
+        user.wallet += amount;
+        await user.save();
+        console.log(`✅ Wallet funded: ${email} - ₦${amount}`);
+      } else {
+        console.log(`❌ User not found for webhook email: ${email}`);
+      }
+    } catch (err) {
+      console.error('Webhook DB Error:', err);
+    }
+  }
+
+  res.sendStatus(200); // Acknowledge receipt
 });
 
 module.exports = router;
